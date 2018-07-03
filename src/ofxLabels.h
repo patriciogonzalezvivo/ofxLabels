@@ -11,8 +11,9 @@
 #define MARGIN 25.0
 #define FONT_CHAR_WIDTH 8.0
 #define FONT_CHAR_HEIGHT 10.0
-//#define CHECK_STRAIGHT_FIRST
 #define OCCLUTION_LENGTH 10.0
+//#define CHECK_STRAIGHT_FIRST
+#define LABEL_AT_LINE
 
 struct ofxLabel {
     string      text;

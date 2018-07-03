@@ -140,10 +140,18 @@ void ofxLabels::update() {
         m_labels[i].bTop = m_labels[i].screen_proj1.y < m_labels[i].screen_center.y;
         
         if (m_labels[i].bLeft) {
+#ifdef LABEL_AT_LINE
+            m_labels[i].screen_proj2.x = MARGIN + m_labels[i].width + FONT_CHAR_WIDTH;
+#else
             m_labels[i].screen_proj2.x = MARGIN;
+#endif
         }
         else {
+#ifdef LABEL_AT_LINE
+            m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN - m_labels[i].width - FONT_CHAR_WIDTH;
+#else
             m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN;
+#endif
         }
         
         // Marks on the screen
@@ -186,12 +194,16 @@ void ofxLabels::draw() {
             label_pos.x = ofGetWidth() - MARGIN - m_labels[i].width;
         }
         
+#ifdef LABEL_AT_LINE
+        label_pos.y = m_labels[i].screen_proj1.y + FONT_CHAR_HEIGHT * 0.5;
+#else
         if (m_labels[i].bTop) {
             label_pos.y = m_labels[i].screen_proj1.y - FONT_CHAR_HEIGHT * 0.75;
         }
         else {
             label_pos.y = m_labels[i].screen_proj1.y + FONT_CHAR_HEIGHT * 1.5;
         }
+#endif
         
         ofDrawBitmapStringHighlight(m_labels[i].text, label_pos);
     }
