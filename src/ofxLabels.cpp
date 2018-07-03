@@ -181,10 +181,10 @@ void ofxLabels::draw() {
             continue;
         }
         
-        ofSetColor(170);
+        //ofSetColor(170);
         ofDrawLine(m_labels[i].screen_position, m_labels[i].screen_proj1);
         ofDrawLine(m_labels[i].screen_proj1, m_labels[i].screen_proj2);
-        ofSetColor(255);
+        //ofSetColor(255);
         ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD );
         
         glm::vec3 label_pos;
