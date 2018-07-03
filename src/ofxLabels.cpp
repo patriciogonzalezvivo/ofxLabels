@@ -27,7 +27,7 @@ void ofxLabels::addLabel(const glm::vec3& _world_pos, const glm::vec3& _screen_c
     label.world_position = _world_pos;
     label.screen_center = _screen_center;
     label.text = _text;
-    label.width = _text.size() * CHAR_WIDTH;
+    label.width = _text.size() * FONT_CHAR_WIDTH;
     m_labels.push_back(label);
 }
 
@@ -100,7 +100,7 @@ void ofxLabels::update() {
         for (int j = i - 1; j >= 0; j--) {
             if (m_labels[j].bVisible && m_labels[i].bLeft == m_labels[j].bLeft) {
                 float screen_distance = m_labels[i].screen_position.y - m_labels[j].screen_proj1.y;
-                if (abs(screen_distance) < CHAR_HEIGHT * 3.0) {
+                if (abs(screen_distance) < FONT_CHAR_HEIGHT * 3.0) {
                     isFreeSpace = false;
                     break;
                 }
@@ -157,7 +157,7 @@ void ofxLabels::update() {
         for (int j = i - 1; j >= 0; j--) {
             if (m_labels[i].bLeft == m_labels[j].bLeft) {
                 float screen_distance = m_labels[i].screen_proj1.y - m_labels[j].screen_proj1.y;
-                if (m_labels[j].bVisible && abs(screen_distance) < CHAR_HEIGHT * 3.0) {
+                if (m_labels[j].bVisible && abs(screen_distance) < FONT_CHAR_HEIGHT * 3.0) {
                     m_labels[i].bVisible = false;
                     break;
                 }
@@ -187,10 +187,10 @@ void ofxLabels::draw() {
         }
         
         if (m_labels[i].bTop) {
-            label_pos.y = m_labels[i].screen_proj1.y - CHAR_HEIGHT * 0.75;
+            label_pos.y = m_labels[i].screen_proj1.y - FONT_CHAR_HEIGHT * 0.75;
         }
         else {
-            label_pos.y = m_labels[i].screen_proj1.y + CHAR_HEIGHT * 1.5;
+            label_pos.y = m_labels[i].screen_proj1.y + FONT_CHAR_HEIGHT * 1.5;
         }
         
         ofDrawBitmapStringHighlight(m_labels[i].text, label_pos);
