@@ -1,6 +1,5 @@
 //
-//  ofxLabelManager.hpp
-//  Orbits
+//  ofxLabels.hpp
 //
 //  Created by Patricio González Vivo on 6/27/18.
 //
@@ -8,7 +7,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxBody.h"
 
 #define MARGIN 25.0
 #define CHAR_WIDTH 8.0
@@ -29,10 +27,10 @@ struct ofxLabel {
     bool        bVisible;
 };
 
-class ofxLabelManager {
+class ofxLabels {
 public:
-    ofxLabelManager();
-    ~ofxLabelManager();
+    ofxLabels();
+    ~ofxLabels();
     
     void    setCamera(ofCamera* _cam);
     void    addLabel(const glm::vec3& _world_pos, const glm::vec3& _screen_center, const std::string& _text);

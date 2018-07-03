@@ -1,29 +1,28 @@
 //
-//  ofxLabelManager.cpp
-//  Orbits
+//  ofxLabels.cpp
 //
 //  Created by Patricio González Vivo on 6/27/18.
 //
 
-#include "ofxLabelManager.h"
+#include "ofxLabels.h"
 
-ofxLabelManager::ofxLabelManager() {
+ofxLabels::ofxLabels() {
     
 }
 
-ofxLabelManager::~ofxLabelManager() {
+ofxLabels::~ofxLabels() {
     
 }
 
-void ofxLabelManager::setCamera(ofCamera* _cam) {
+void ofxLabels::setCamera(ofCamera* _cam) {
     m_cam = _cam;
 }
 
-void ofxLabelManager::clear(){
+void ofxLabels::clear(){
     m_labels.clear();
 }
 
-void ofxLabelManager::addLabel(const glm::vec3& _world_pos, const glm::vec3& _screen_center, const std::string& _text) {
+void ofxLabels::addLabel(const glm::vec3& _world_pos, const glm::vec3& _screen_center, const std::string& _text) {
     ofxLabel label;
     label.world_position = _world_pos;
     label.screen_center = _screen_center;
@@ -40,7 +39,7 @@ bool depthCheck (const ofxLabel& _a, const ofxLabel& _b) {
     return _a.screen_position.z < _b.screen_position.z;
 }
 
-void ofxLabelManager::update() {
+void ofxLabels::update() {
     
     // Update the 2D screen position
     for (unsigned int i = 0; i < m_labels.size(); i++) {
@@ -167,7 +166,7 @@ void ofxLabelManager::update() {
     }
 }
 
-void ofxLabelManager::draw() {
+void ofxLabels::draw() {
 
     for (unsigned int i = 0; i < m_labels.size(); i++) {
         if ( !m_labels[i].bVisible ) {
