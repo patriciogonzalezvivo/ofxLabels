@@ -141,14 +141,14 @@ void ofxLabels::update() {
         
         if (m_labels[i].bLeft) {
 #ifdef LABEL_AT_LINE
-            m_labels[i].screen_proj2.x = MARGIN + m_labels[i].width + FONT_CHAR_WIDTH;
+            m_labels[i].screen_proj2.x = MARGIN + m_labels[i].width;
 #else
             m_labels[i].screen_proj2.x = MARGIN;
 #endif
         }
         else {
 #ifdef LABEL_AT_LINE
-            m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN - m_labels[i].width - FONT_CHAR_WIDTH;
+            m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN - m_labels[i].width;
 #else
             m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN;
 #endif
