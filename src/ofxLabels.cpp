@@ -7,11 +7,33 @@
 #include "ofxLabels.h"
 
 ofxLabels::ofxLabels() {
-    
+    m_bkg = false;
 }
 
 ofxLabels::~ofxLabels() {
     
+}
+
+void ofxLabels::loadFont(string _name, float _size) {
+#if defined(SDFFONT)
+    m_font.load(_name, _size);
+#elif defined(FONTSTASH)
+    m_font.setup(_name);
+    m_font_size = _size;
+#elif defined(HERSHEYFONT)
+    m_font.setColor(ofColor(255));
+    m_font_scale = _size;
+#endif
+    
+}
+
+void ofxLabels::setBackgroundColor(ofFloatColor _color) {
+    m_bkg_color = _color;
+    m_bkg = true;
+}
+
+void ofxLabels::setFrontgroundColor(ofFloatColor _color) {
+    m_fnt_color = _color;
 }
 
 void ofxLabels::setCamera(ofCamera* _cam) {
@@ -27,7 +49,23 @@ void ofxLabels::addLabel(const glm::vec3& _world_pos, const glm::vec3& _screen_c
     label.world_position = _world_pos;
     label.screen_center = _screen_center;
     label.text = _text;
-    label.width = _text.size() * FONT_CHAR_WIDTH;
+    
+#if defined(SDFFONT)
+    ofRectangle bbox = m_font.getStringRect(_text, ofVec2f(0.,0.));
+    label.width = bbox.width;
+    label.height = bbox.height;
+#elif defined(FONTSTASH)
+    ofRectangle bbox = m_font.getBBox(_text, m_font_size, 0, 0);
+    label.width = bbox.width;
+    label.height = bbox.height;
+#elif defined(HERSHEYFONT)
+    label.width = m_font.getWidth(_text, m_font_scale);
+    label.height = m_font.getHeight( m_font_scale);
+#else
+    label.width = _text.size() * BITMAP_FONT_CHAR_WIDTH;
+    label.height = BITMAP_FONT_CHAR_HEIGHT;
+#endif
+    
     m_labels.push_back(label);
 }
 
@@ -93,19 +131,19 @@ void ofxLabels::update() {
         m_labels[i].bLeft = m_labels[i].screen_position.x < m_labels[i].screen_center.x;
         
         // Is there space at that height on the screen
-#ifndef CHECK_STRAIGHT_FIRST
-        bool isFreeSpace = false;
-#else
+#ifdef CHECK_STRAIGHT_FIRST
         bool isFreeSpace = true;
         for (int j = i - 1; j >= 0; j--) {
             if (m_labels[j].bVisible && m_labels[i].bLeft == m_labels[j].bLeft) {
                 float screen_distance = m_labels[i].screen_position.y - m_labels[j].screen_proj1.y;
-                if (abs(screen_distance) < FONT_CHAR_HEIGHT * 3.0) {
+                if (abs(screen_distance) < m_labels[i].height * 2.0) {
                     isFreeSpace = false;
                     break;
                 }
             }
         }
+#else
+        bool isFreeSpace = false;
 #endif
         
         if (isFreeSpace) {
@@ -128,12 +166,12 @@ void ofxLabels::update() {
             continue;
         }
         
-        if (m_labels[i].screen_proj1.x < MARGIN + m_labels[i].width) {
-            m_labels[i].screen_proj1.x = MARGIN + m_labels[i].width;
+        if (m_labels[i].screen_proj1.x < MARGIN + m_labels[i].width + HIGHLIGHT_WIDTH_MARGIN) {
+            m_labels[i].screen_proj1.x = MARGIN + m_labels[i].width + HIGHLIGHT_WIDTH_MARGIN;
         }
         
-        if (m_labels[i].screen_proj1.x > ofGetWidth() - MARGIN - m_labels[i].width) {
-            m_labels[i].screen_proj1.x = ofGetWidth() - MARGIN - m_labels[i].width;
+        if (m_labels[i].screen_proj1.x > ofGetWidth() - MARGIN - m_labels[i].width - HIGHLIGHT_WIDTH_MARGIN) {
+            m_labels[i].screen_proj1.x = ofGetWidth() - MARGIN - m_labels[i].width - HIGHLIGHT_WIDTH_MARGIN;
         }
         
         // Top or Bottom
@@ -141,14 +179,14 @@ void ofxLabels::update() {
         
         if (m_labels[i].bLeft) {
 #ifdef LABEL_AT_LINE
-            m_labels[i].screen_proj2.x = MARGIN + m_labels[i].width;
+            m_labels[i].screen_proj2.x = MARGIN + m_labels[i].width + 10.0;
 #else
             m_labels[i].screen_proj2.x = MARGIN;
 #endif
         }
         else {
 #ifdef LABEL_AT_LINE
-            m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN - m_labels[i].width;
+            m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN - m_labels[i].width - 10.0;
 #else
             m_labels[i].screen_proj2.x = ofGetWidth() - MARGIN;
 #endif
@@ -165,7 +203,7 @@ void ofxLabels::update() {
         for (int j = i - 1; j >= 0; j--) {
             if (m_labels[i].bLeft == m_labels[j].bLeft) {
                 float screen_distance = m_labels[i].screen_proj1.y - m_labels[j].screen_proj1.y;
-                if (m_labels[j].bVisible && abs(screen_distance) < FONT_CHAR_HEIGHT * 3.0) {
+                if (m_labels[j].bVisible && abs(screen_distance) < m_labels[j].height * 3.0) {
                     m_labels[i].bVisible = false;
                     break;
                 }
@@ -181,11 +219,7 @@ void ofxLabels::draw() {
             continue;
         }
         
-        //ofSetColor(170);
-        ofDrawLine(m_labels[i].screen_position, m_labels[i].screen_proj1);
-        ofDrawLine(m_labels[i].screen_proj1, m_labels[i].screen_proj2);
-        //ofSetColor(255);
-        ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD );
+        
         
         glm::vec3 label_pos;
         if (m_labels[i].bLeft) {
@@ -195,16 +229,38 @@ void ofxLabels::draw() {
         }
         
 #ifdef LABEL_AT_LINE
-        label_pos.y = m_labels[i].screen_proj1.y + FONT_CHAR_HEIGHT * 0.5;
+        label_pos.y = m_labels[i].screen_proj1.y + m_labels[i].height * 0.5;
 #else
         if (m_labels[i].bTop) {
-            label_pos.y = m_labels[i].screen_proj1.y - FONT_CHAR_HEIGHT * 0.75;
+            label_pos.y = m_labels[i].screen_proj1.y - m_labels[i].height * 0.75;
         }
         else {
-            label_pos.y = m_labels[i].screen_proj1.y + FONT_CHAR_HEIGHT * 1.5;
+            label_pos.y = m_labels[i].screen_proj1.y + m_labels[i].height * 1.5;
         }
 #endif
         
-        ofDrawBitmapStringHighlight(m_labels[i].text, label_pos);
+        ofPushStyle();
+        ofFill();
+
+        if (m_bkg) {
+            ofSetColor(m_bkg_color);
+            ofDrawRectangle(label_pos.x - HIGHLIGHT_WIDTH_MARGIN, label_pos.y - m_labels[i].height * 1.5, m_labels[i].width + HIGHLIGHT_WIDTH_MARGIN * 2., m_labels[i].height * 2.);
+        }
+        
+        ofSetColor(m_fnt_color);
+        ofDrawLine(m_labels[i].screen_position, m_labels[i].screen_proj1);
+        ofDrawLine(m_labels[i].screen_proj1, m_labels[i].screen_proj2);
+        
+#if defined(SDFFONT)
+        m_font.draw(m_labels[i].text, label_pos.x, label_pos.y);
+#elif defined(FONTSTASH)
+        m_font.draw(m_labels[i].text, m_font_size, label_pos.x, label_pos.y);
+#elif defined(HERSHEYFONT)
+        m_font.draw(m_labels[i].text, label_pos.x, label_pos.y, m_font_scale);
+#else
+        ofSetDrawBitmapMode(OF_BITMAPMODE_MODEL_BILLBOARD );
+        ofDrawBitmapString(m_labels[i].text, label_pos);
+#endif
+        ofPopStyle();
     }
 }
