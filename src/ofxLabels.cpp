@@ -8,6 +8,7 @@
 
 ofxLabels::ofxLabels() {
     m_bkg = false;
+    m_straight = false;
 }
 
 ofxLabels::~ofxLabels() {
@@ -130,21 +131,21 @@ void ofxLabels::update() {
         // Right or Left
         m_labels[i].bLeft = m_labels[i].screen_position.x < m_labels[i].screen_center.x;
         
+        bool isFreeSpace = false;
+        
         // Is there space at that height on the screen
-#ifdef CHECK_STRAIGHT_FIRST
-        bool isFreeSpace = true;
-        for (int j = i - 1; j >= 0; j--) {
-            if (m_labels[j].bVisible && m_labels[i].bLeft == m_labels[j].bLeft) {
-                float screen_distance = m_labels[i].screen_position.y - m_labels[j].screen_proj1.y;
-                if (abs(screen_distance) < m_labels[i].height * 2.0) {
-                    isFreeSpace = false;
-                    break;
+        if (m_straight) {
+            isFreeSpace = true;
+            for (int j = i - 1; j >= 0; j--) {
+                if (m_labels[j].bVisible && m_labels[i].bLeft == m_labels[j].bLeft) {
+                    float screen_distance = m_labels[i].screen_position.y - m_labels[j].screen_proj1.y;
+                    if (abs(screen_distance) < m_labels[i].height * 2.0) {
+                        isFreeSpace = false;
+                        break;
+                    }
                 }
             }
         }
-#else
-        bool isFreeSpace = false;
-#endif
         
         if (isFreeSpace) {
             m_labels[i].screen_proj1 = m_labels[i].screen_position;
@@ -218,8 +219,6 @@ void ofxLabels::draw() {
         if ( !m_labels[i].bVisible ) {
             continue;
         }
-        
-        
         
         glm::vec3 label_pos;
         if (m_labels[i].bLeft) {

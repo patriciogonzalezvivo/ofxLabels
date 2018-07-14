@@ -16,9 +16,7 @@
 
 #define OCCLUTION_LENGTH 10.0
 
-//#define CHECK_STRAIGHT_FIRST
-
-//#define LABEL_AT_LINE
+#define LABEL_AT_LINE
 
 //#define SDFFONT
 //#define FONTSTASH
@@ -55,6 +53,7 @@ public:
     
     void    setCamera(ofCamera* _cam);
     
+    void    setStraightLines(bool _straight) { m_straight = _straight; }
     void    setBackgroundColor(ofFloatColor _color);
     void    setFrontgroundColor(ofFloatColor _color);
     
@@ -83,5 +82,7 @@ private:
     ofFloatColor        m_bkg_color;
     
     ofCamera*           m_cam;
+    
+    bool                m_straight;
     bool                m_bkg;
 };
