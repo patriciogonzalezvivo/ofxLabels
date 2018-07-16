@@ -18,6 +18,7 @@ ofxLabels::~ofxLabels() {
 void ofxLabels::loadFont(string _name, float _size) {
 #if defined(SDFFONT)
     m_font.load(_name, _size);
+    m_font.setGamma( 0.3 );
 #elif defined(FONTSTASH)
     m_font.setup(_name);
     m_font_size = _size;

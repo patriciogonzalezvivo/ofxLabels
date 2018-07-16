@@ -16,7 +16,7 @@
 
 #define OCCLUTION_LENGTH 10.0
 
-#define LABEL_AT_LINE
+//#define LABEL_AT_LINE
 
 //#define SDFFONT
 //#define FONTSTASH
